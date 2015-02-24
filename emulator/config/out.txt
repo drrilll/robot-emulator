@@ -1,0 +1,227 @@
+{{
+  blockgame
+
+  this code causes the robot to look for orange blocks and push them to a wall without bumping into other robots.
+}}
+
+
+con
+  
+  
+  _clkmode   = xtal1 + pll16x
+  _xinfreq   = 5_000_000
+                      
+,>var
+   long lefttotal     
+   long righttotal    
+
+   long wanderleft    
+   long wanderright   
+
+   long avoidleft     
+   long avoidright
+
+   long targetleft
+   long targetright
+   long targetstraight
+
+  
+
+   long random
+   long turncounter
+   long haveseenblock
+   long haveblock
+
+   long actualleftspeed
+   long actualrightspeed
+   long desiredleftspeed
+   long desiredrightspeed
+   
+,>con
+   wanderpriority     = 2
+   avoidpriority      = 8
+   goalpriority       = 4
+
+   red_track = 187
+   green_track = 16
+   blue_track = 16
+   sensitivity = 30
+
+   acceleration = 4
+   full_speed = 20
+   half_speed = 12
+                    
+,>obj 
+  beeper:       "beeper"                   
+  servos:       "servocontrol"
+  irsensors:    "ir8sensorarray" 
+  block:        "blocksensor"
+  camera:       "cmucam"  
+  rbc:          "rbc"
+  
+,>pub main,<
+  rbc.init
+  camera.start
+  camera.settrackcolor(red_track,green_track,blue_track,sensitivity)
+  beeper.startup 
+  servos.start(748, 749, true, true, true, false)
+  servos.setheadpitch(105)
+
+  actualleftspeed := 0
+  actualrightspeed := 0
+  desiredleftspeed := full_speed
+  desiredrightspeed := full_speed
+
+  turncounter := 1
+  repeat,<
+   wanderleft := wanderright := avoidleft := avoidright := targetleft := targetright := targetstraight := 0
+   random := || ?cnt // 15
+   rbc.debugstr(string("random: "))
+   rbc.debuglong(random)
+   
+    
+    makeamove
+
+    
+    lookforblock
+    if (block.detect),<
+      foundblock
+   ,> irsensors.capture                          
+
+    
+    if (irsensors.detect(1) and not irsensors.detect(3)),<
+      if (haveblock),<
+        dropblock
+     ,> else,<
+        avoidright := 1
+        turncounter := 2
+      
+    
+   ,>,> elseif (irsensors.detect(3) and not irsensors.detect(1)),<
+      if (haveblock),<
+        dropblock
+     ,> else,<
+        avoidleft := 1
+        turncounter := 2
+      
+    
+   ,>,> elseif (irsensors.detect(2)),<
+      if (haveblock),<
+        dropblock
+     ,> else,<
+        if(random // 2 == 0),<
+          avoidright := 1  
+       ,> else,<
+          avoidleft := 1
+       ,> turncounter := 2
+
+    
+   ,>,> elseif(random == 0),<
+        if(random // 2 == 0),<
+          wanderleft := 1     
+       ,> else,<
+          wanderright := 1
+       ,> turncounter := 5 
+   ,> else,<
+      turncounter := 1
+
+    
+   ,> if (haveseenblock or haveblock),<
+      wanderleft := wanderright := 0
+                               
+   ,> lefttotal := (wanderleft * wanderpriority) + (avoidleft * avoidpriority) + (targetleft * goalpriority)
+    righttotal := (wanderright * wanderpriority) + (avoidright * avoidpriority) + (targetright * goalpriority)
+
+    if (lefttotal > righttotal),<
+        desiredleftspeed := full_speed
+        desiredrightspeed := -1 * full_speed                    
+   ,> elseif (righttotal > lefttotal),<
+        desiredleftspeed := -1 * full_speed
+        desiredrightspeed := full_speed                          
+   ,> else                   ,<
+        desiredleftspeed := full_speed
+        desiredrightspeed := full_speed 
+               
+ ,>,> servos.stop
+
+
+,>pub makeamove,<
+    repeat until (turncounter == 0),<
+      if(actualleftspeed < desiredleftspeed),<
+          actualleftspeed += acceleration
+     ,> elseif(desiredleftspeed < actualleftspeed),<
+          actualleftspeed -= acceleration
+     ,> if(actualrightspeed < desiredrightspeed),<
+          actualrightspeed += acceleration
+     ,> elseif(desiredrightspeed < actualrightspeed),<
+          actualrightspeed -= acceleration
+     ,> servos.setspeeds(actualleftspeed, actualrightspeed)
+      turncounter--     
+      rbc.debugstr(string("turncounter: "))
+      rbc.debuglongcr(turncounter)
+      waitcnt(1600000 + cnt)
+
+
+
+      ,>
+,>pub lookforblock,<
+  camera.trackcolor   
+  if (camera.getcenterx == 0) and (camera.getconfidence == 0),<
+    
+ ,> elseif (camera.getcenterx > 55) and (camera.getconfidence > 5) ,<
+    targetright := 1
+ ,> elseif (camera.getcenterx < 15) and (camera.getconfidence > 5) ,<
+    targetleft := 1
+ ,> else,<
+    targetstraight := 1         
+  
+ ,> haveseenblock := targetright or targetleft or targetstraight
+  if (targetstraight),<
+    beeper.beep(20,500) 
+    rbc.debugstr(string("block straight ahead!"))
+    rbc.debugcr 
+ ,> elseif (haveseenblock),<
+     beeper.beep(20,250)
+     rbc.debugstr(string("steering toward block ..."))
+     rbc.debugcr
+
+,>
+,>pub foundblock,<
+  
+  servos.setleftgripper(servos#left_gripper_min)
+  servos.setrightgripper(servos#right_gripper_min)
+  beeper.ok
+  haveblock := true
+  rbc.debugstr(string("found a block!"))
+  rbc.debugcr 
+  servos.setheadpitch(servos#pitch_mid)
+
+
+,>pub dropblock,<
+  
+  servos.setleftgripper(servos#left_gripper_max)
+  servos.setrightgripper(servos#right_gripper_max)
+  haveblock := false
+
+  
+  desiredleftspeed := -full_speed
+  desiredrightspeed := -full_speed                     
+  turncounter := 50
+  makeamove
+  rbc.debugstr(string("dropped off a block!"))
+  rbc.debugcr 
+  beeper.error
+
+  
+  if(random // 2 == 0),<
+    desiredleftspeed := -1 * full_speed
+    desiredrightspeed := full_speed                       
+ ,> else,<
+    desiredleftspeed := full_speed
+    desiredrightspeed := -1 * full_speed                  
+ ,> turncounter := 10
+  rbc.debugstr(string("turn counter: "))
+  rbc.debuglongcr(turncounter)
+  makeamove
+  servos.setheadpitch(105)
+,>

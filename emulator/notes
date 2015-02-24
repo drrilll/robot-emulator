@@ -1,0 +1,418 @@
+
+
+Alright you have to integrate the memory of different objects, it is getting far too complicated
+and its hard to tell why the string corrupted memory. 
+
+My "memory" appears to be working, but what to do now about strings? ie string("hello")
+So every time the compiler comes across a string, it needs to send a message to the eclosing method 
+that it will need "x" more bytes. I think I could have allocated it dynamically as well. Oh well
+
+Where can we use this? It is almost exclusively an expression. I think as an expression it
+returns an address, which means it can be used anywhere. Yes, it does return an address. I will
+have to check for it EVERY-FREAKING-WHERE.
+I will start with the expression handler, and look for it other places later
+
+You can access variables from different objects using pointers. Ugghh. I have to integrate the 
+memory somehow.
+
+For the elseif statement, I can put elseif into the statement itself, but I need some way to communicate 
+that it is an elseif block, rather than an else block. Important distinction, but I have no facility to 
+do this. *********done
+/emulator/src/dang/robotTracker/BluetoothDeviceFinder.java
+/emulator/src/dang/robotTracker/BluetoothServer.java
+/emulator/src/dang/robotTracker/BluetoothServerEasyBlue.java
+****Just power forward, you can debug and shit later**********
+****Better to have your code base that "mostly" works. Don't get hung up*******
+
+Remember, you can do this.
+
+Things to test in the lab:
+
+mathematical order of operations
+
+does spin catch the difference between if (a == 1) and if (a = 1) ? I think it does but check
+
+***************************** Interpreter and Simulator TODO List *******************************
+
+It would appear, the way Spin does things, and I will need to confirm in
+the lab, is that with variable access x is equivalent to x[0]. Needs confirmation **done
+
+Also, how u handle makeassignment is largely unnecessary. you can cut it to like 3 lines
+
+recheck all the expressions. I am sure some will not work. But its a better implementation when
+nextToken is always explicitly called by the calling function, since it some cases it may not want to 
+call it.
+
+A reliable way to implement indentation. ****done with errors
+
+Apparently there can be no indentation on the headers. This is probably incorrect
+
+Holy crap I have to remove the local variables for each method when I am done. Gar, probably each 
+method will have to hold its own local variables. I don't know. They already do, but I am 90% sure 
+there is a logic error somewhere, ie , we don't check the localvariables. I am reading this and I 
+am not sure what I am talking about
+
+wipe the variables and state between runs. It is maintaining state. Jebus, everything may need a
+separate Initialize method that gets called by the constructor. what a pain. ***new program every time,
+seems to be working OK
+
+make all future classes have an initialize method. *** don't need this
+
+expressions don't evaluate in proper order, or deal with parantheses properly (they can be unbalanced)
+
+can do the ordering of expressions independantly later, if I save the bracket locations.
+
+make the behaviour of different data types appropriate***********done i think by using the proper java
+classes -not quite, still need the ~ **done
+
+implement next and until in repeat loops. Should be fun
+
+the math and logical expressions are where you will need to implement the ~. Probably have to make
+a variable wrapper class.**done
+
+BIG TODO - have to integrate the program and object memory. Have to pass it the "main" program. 
+**done I think. Was pretty easy
+
+implement SPIN numbers, ie 1_000;**donezo; also binary, quad, octal and hex
+
+implement ranges in ListExpression - OK, now figure out how to make it work **done
+
+abort and abort trap
+
+object constant reference # **done
+
+post and pre increment and decrement
+
+doesnt compile the open file
+
+implement RANGE properly. It reads .. as float value 2. and then a separate . Will have to turn
+off number parsing and do it myself. should be fun. I have to rewrite the number parsing code in 
+order to return. I'll have to do this when I do floats anyway. Because I won't be able to tell the
+difference **done
+
+the y coordinates of the tracker are inversed from how it is drawn on the panel. ugh**done
+
+implement the case statement
+
+lab test for float32full frac and cmp. frac is 1 argument. Bizarre
+***************************** END Interpreter and Simulator TODO List END *******************************
+
+
+When you press the start tracker button multiple times, you get multiple trackers
+
+In SpinString.evaluateToValue I increment the stack pointer and it never gets decremented
+Solution: instead of merely increasing the memory, send some more relevant information. Then have
+the memory for the string literal allocated at the same time as the variables. You could stick it in 
+with the variables. Then have a getSize method on the variables, which is what you pass when calculating
+memory(instead of the type). This seems to work up until it crashes
+
+For starters this blue tooth is losing its mind. Put a delay in there, and put a way to shut it down
+properly. Interrupt is, I beleive, deprecated.
+
+I think I might take bluetooth out altogether. I don't need it. Put my hooks directly where they need
+to go.
+
+And it crashes on:
+
+debugstrcr calling method: main
+location for string is: 12
+Length of string: 10
+setting memory to location: 12
+
+every time. The next line is:
+
+****************************statement: MethodCall: wallfollow
+
+So it crashes either before it or during it. Popular opinion is that the stream buffer
+fills up and crashes. So take out or fix the bluetooth
+
+RBC is working, bluetooth is still there, so its semi-realistic.
+I think if you have time though, hook it up straight to hardware
+
+You will have to change incrementstackpointer, and all those fun classes as well, to handle arrays
+Or I can just use the increment with integer.
+
+Still have to do the initialization
+
+********************* UI TODO List ***********************************
+
+-use JTabbedPane to have multiple windows**
+-save last files loaded into the configuration file**
+-save obstacles to the configuration file
+-multiple colours on the IDE
+-implement save and save as**
+-file browser open on the left of the IDE (optional)
+
+********************* UI TODO List ***********************************
+
+What if I save like every single token I read, then I can put it back to 
+wherever I want? Say a call to reverse(2) or something? Instead of calling
+super.nextToken, I can call a wrapper class that saves all this state.
+
+Just have to implement " quotes for strings,** done and I forget. Haha that is never good
+
+Comments was the other thing. Also end of lines
+
+Oh yeah, maybe use a byte array
+
+********************* In Lab Testing ***********************************
+memory, pointers, 1st position of array accessed by foo? is foo = foo[0]? Can
+I assign a long to point at an array address, then access elements like this[2]? The problem with
+that is what is the default memory location size.
+
+the default behaviour for calling an object function without starting it first. ie, servos, camera,
+float math, beeper, rbc.
+
+What kind of floating point numbers are they? Figure out what the bit map is. I can implement my own
+float if need be.
+
+DIRRS $$$$$$$$$$$$$$$$$$$$$$$
+
+sensor is 3.12 cm behind robots center, so all measurements need to be adjusted. Wait, who cares. Actually
+I will probably have to add that much on for the map readings to work
+
+Beam width: 6 degrees
+max range : 80 cm
+distance error : +-5%
+
+So that is where you detect, try and throw in some noise, make oblique angles less reliable, etc.
+Nah, leave that for later. For now just do 3 lines, both sides and the middle and 100% accuracy.
+
+You can have the obstacles have a sensor reliability rate, so it randomly will miss it at times.
+
+Make an error function for the distance, one that is bell-curved
+
+*****************************************LAB INFO**************************************************
+soo foo = foo[0]
+array access goes by variable size
+regular floating point
+
+servo does not hang, just does nothing
+floating point hangs
+
+blocks 150 60 16
+flowerpots 140 50 16
+white wall 150-160 140-150 25-28
+general 162 122 18
+dark walls 150 102 16
+
+x = 40 -45 is dead ahead gets smaller to the right (gone at 0)
+y = 136 (roughly) gets bigger going down
+spread is around 40 degrees, distance 80 cm or so, but further in the center 
+(which I won't worry about)
+camera height of 13-14 cm. (13.5), which mathematically gives a dead zone 
+consistent with the lab.
+
+servo values
+
+headcenterpitch 128
+headuppitch 155 maybe 38-40 degrees
+headdownpitch 90 call it 42 degrees
+
+headyawcenter 142
+headyawleft 60  at 90 degrees
+headyawright 231  90 degrees
+
+leftgripopen 146
+rightgripopen 160
+rightgripclosed 100
+leftgripclosed 208
+
+and stop values of 750
+
+Ok, so when the robot hits a block, the block has to move. The robot will not deviate, 
+and it will also depend if it gets hooked on the grippers. Keep it simple, no grippers
+
+What kind of events can happen? 
+
+block can go within the grippers, if they are wide enough
+block can go outside the grippers, if they are closed or the angle is bad
+block can be pushed from somewhere other than the front
+
+Thinking, maybe the grippers are their own rectangle, with their own collision detection. 
+When the grippers open or close I can adjust the, in this case x coordinates to reflect that.
+
+So the gripper rectangle has exactly the same logic as the robot, except that the size can change
+We can draw a line across the front of where the grippers should be, that is increased or 
+decreased with the gripper width. So check if the block crosses the line, and see if it impacts
+one of the two points. I can just make the line wider than the actual grippers, and if it contacts
+an end point it slides off the outside
+
+If I make the robot 4 lines instead of a rectangle I can tell what side is colliding. getting
+complicated.
+
+Do the old, "quit without saving?" routine. close without saving, save as, and cancel buttons
+
+Block detect. Need to think of the simplest way possible. Simplest is preset grabber values.
+Within certain limits its open, within others half open, and some it is closed. Presets.
+
+Wide open it scoops blocks
+
+The collision detection is based on a circle. Whether it goes in or slides off is based on
+the collision angle being more or less in line with the robot angle. So if you hit it directly
+from the front, the block can slide in when they are almost closed. When a block is grabbed 
+"teleport" to the center. Lose it if you back up. You don't need all the functionality right 
+away, just get something working.
+
+You already have the angles, it is the angles that the grippers are at. Their offset angles
+(from the robot), the block should lie between them. Similar to the camera detection 
+algorithm. Probably exactly the same. Can I 'see' the block. Will see how that goes. Don't
+worry about deflection right now. Implement that later.
+
+Big problems with the tokenizer, specifically the else statement is fracking up. ***OK
+we are good
+
+Angle is opposite what it is supposed to be for the block detect (ie, the grippers, have
+to look into that). It does it properly for the camera detection. Actually the entire
+robot angle is inversed, because the y-axis is inversed. I need a solution for that
+
+The Y goes from 25 (at the bottom), to 465 at the top. This in not including the
+width of the wall
+
+it can read y at -32, but the image starts at around 0, up to 479 at the top. so 480
+pixels along the y axis
+
+x is 0 to 647, so probably 650.
+
+Solution: Since all the code is working, I would have to translate through
+the dialogs. And also through the rbc and fix the angle. Which reminds me, I did
+have to modify the angle to get the tags to work. I had to phase shift it 180 degrees
+
+So maybe the robot should report its location according to the mouse position,
+and. meh. Just translate it when talking to RBC and using the dialogs. ***Done
+for dialogs
+
+now I have to implement a system for determining whether it is clutching a block
+or not.
+
+3 situations, closed, half-way open, and wide open.
+
+closed is easy, tack it to the spot and move it with the robot.
+
+wide open - if we block detect and if the robot is moving forward. If the
+robot is pivoting or moving backwards the block can slip out. How to determine,
+sharpness of turn?
+
+Whatever, just have it bounce off of the circle. Change the collision
+handling to have the block move. **Done
+
+The range on the blockDetect is too far. Now I have to figure if and when the 
+block gets hooked in the grippers. I could do the short range block detect called 
+by the spin code, and a longer range one called internally.
+
+Think about it straight on. If the grippers are angled, it will slide down. What if
+you could angle then outward? Functionally equivalent. If the direction of motion
+is perpendicular to the direction that the gripper lies in the block will go in 
+the same direction as the robot. If it is at an angle, it will slide outward, but 
+(technically) not onward. Not true, say 45 degrees is the cutoff. Duh, it moves
+in the direction of the normal until it slides off or gets stuck on the front of
+the robot. Or I can just put an invisible circle on the front.
+
+simple. There is a cutoff. Get something working no matter how stupid.
+
+There is a gripper cutoff range. If its closed, the block stays put. If not, it
+stays put in a forward direction, and stays behind in reverse. Do 3 settings. Closed,
+semi and open. Closed, stays put. Semi, stays put forward, left behind in reverse.
+Open stays put going forward, slides off in turns. 
+
+How to slide off in turns?
+Robot moves from a to b and the angle changes. Have the block stay at the selected
+angle to the robot. So if it is open it does not go in the pocket.
+
+To start, make it close on the block, and have the block hang in there.
+Holy shit the grippers can be at different values. So dynamic it is. So the obstacle
+is pushed in the direction of the normal. Easy peasy. If the gripper pushes it,
+it must be placed exactly along the gripper. So check for a detected block, if it is
+there then move it according to the normals, first checking that it is outside the robot,
+then check the grippers. If it is placed along one gripper, there is no need to check
+the other.
+
+Also have to check the gripper movement. If they move and there is a block detected, 
+we have to handle that. There is a new normal. (I may fudge the normal to point in 
+towards the robot slightly. Otherwise closing the grippers could send the block
+out of the grippers. Physically possible, but the real grippers are angled to prevent 
+that.) Fortunately the normal is the same direction of the little hook lines on
+the gripper. 
+
+Writing a freaking novel here.
+
+So I have to do a block detect every collision call. And if it returns true, 
+check that it is positioned appropriately
+
+Have to take into account that the normals will change on a rotation. Likely 
+just use the most current normal. I may need to track robot rotation as well.
+Statically though, not rcc. Not rate, but how much change in angle there was
+would be handy. Definitely. I could take the average normal, or just the latest.
+I'll try just the latest for now. 
+
+Sign extend. Can just take the address and extract the value. Sign extend is
+an expression.
+
+I can convert the float to an int right in the tokenizer, and send it back as 
+a number. Its the method or contexts job to make the conversion anyway.
+
+
+FloatString - setting precision still allows trailing 0's
+
+Method may not need to be a statement
+
+I think you need to change the way SpinStrings are handled. ie, ie idk.
+
+
+
+variable expressions
+
+Solution***********************************
+So for retaining the floatstring in memory, you need to override the initialize and release.
+If you set the stack pointer to the last location plus the length of the string. Then
+I have to make sure string objects get allocated first. What if there is more than 1 string?
+Then you are fubarred. I can't selectively save them. I would have to track the pointers, make 
+sure there is still a reference to it. Or put them all in global memory.
+
+
+I think I am going to have to implement a parantheses stack. Might require lots of rewrite.
+But it would be a stack of, and I will likely have to make an interface, spinobjects that open
+a paranthesis. Then, when I find a closing one I can pop the stack and close off that particular
+expression. At the end of each line the stack should be empty or an error is thrown. Also, if
+you try and pop an empty stack an error is thrown. That way I know what paranthesis belongs to 
+who. If I come across a paranthesis and it doesn't apply to the current expression I close it 
+right away and go looking back along the chain. Instead of, you know, crossing my fingers and
+hoping it all works out, which was essentially my initial implementation. The guess and pray method.
+
+Who has paratheses? Method calls. Expressions. And I have to track them over both. Or I can check the
+parantheses stack at the EOL. Make it in the compiler, and pass a reference to both. 2 types.
+Belonging to a method and to an expression. So from the expression handler we know if we are done
+even if there are still some on the stack.
+
+parse should also enter and exit with the same number of parantheses. I might rewrite this whole
+fucking thing. The little helper functions seem to track 
+
+
+So using ANTLR to parse - I need a way to preprocess the file, inserting braces (or whatever) in place of
+the indentations. Is this doable? Where is matters is with statements that contain blocks. No where else (as
+in not for methods. They are delineated by the headers).
+
+I should be able to make a parser to do that. Using a stack is an excellent idea. Could have helped my own 
+implementation. Which, I could rewrite. Holy crap. 
+
+So parse through for the relevant tokens. (if, repeat, while, case). When they are found, push the indentation
+on to the stack (probably push a -1 to start), and insert the token ('{'?) in the appropriate place. When you reach
+the same or less, pop it off and insert a '}'. You will need to use something else of course. [[ and ]]. can't use that.
+use ,< and >,. That will work. Put in a token for every value you need to pop off. else and elseif must be at the 
+exact level of indentation. Should be able to do this with my parser. 
+
+
+Since my parser works for extracting methods, I will use that as a precompile pass also
+
+
+implement rand, memmove and all that junk, bytecopy, make sure everything is parsed in lower case.
+
+Starting to think about AST's. They seem fairly straight forward, I don't know why I avoided them.
+ Also- would it  be possible to do the indentation parsing with AnTLR? I could just use a separate grammar
+ that only looks at indentation and comments. Think I will try and write it.
+
+Going to make global variable space, and make sure a copy of everything that resides in 
+it is passed to the objects. Have to include it in isVariable and getVariable or 
+whatever it is, so as to not break my code. 
+
+

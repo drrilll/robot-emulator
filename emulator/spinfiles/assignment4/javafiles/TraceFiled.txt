@@ -1,0 +1,13 @@
+The strategy was largely what was outlined in the notes, but with a few tweaks.
+
+For starters there are actually two java files. There is the TraceFixer.java, which depends on a Trace.java object(for the second pass over the data).
+
+The Fixer makes two passes over the data (well, three kind of. As I pass it into the ArrayList of Trace objects I cull out the high sensor readings). I figured that was easiest, since if I wanted more changes I could make more passes, and not try and change everything at once.
+
+It takes out any 255 sensor readings (as they were originally -1 and thus a non-reading) and replace them with 0. Also any lines of data that have multiple readings it spreads out, initially using copies of the original location.
+
+Then it passes it into an ArrayList, where it takes out sensor readings that are too high. Then it goes through another method which takes all the duplicate locations and averages them out between the the reading before and the reading after, so that there is a smooth transition. It also averages blind spots (location -1,-1,-1) and gives them a value between the good readings on either side.
+
+I ended up taking out all of the readings from BorderMap.trc except for ir6. The readings were mostly garbage, but I wanted the incorporated robot shape as it wall followed (as it makes a nice definitive border), so I needed ir6.
+
+In NavigateMap.trc I took out any Sonar over 80, and any Dirrs over 77 (through trial and error, it made the most accurate map). I didn't bother with ir6, as it was mostly 0's.

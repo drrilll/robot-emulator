@@ -1,0 +1,162 @@
+TODO list:
+
+number formatting (ie 10_000_000)
+also numbers can be written up to 2^32 -1 in absolute value in spin, which means you need to
+read them into a long and manually check the value before writing it to the variable **done
+
+also handle that special con case **done
+
+separate < from <=, or rather use < =? or something. That should work. Apparently its not an issue and
+everything works fine. **done
+
+sending data out from robot **done
+
+	
+problem with the tab preprocessor. When there is a single line comment the tabs are messed up
+Have to fix that Still a problem, same as before. Might have to do a more thorough walk-through **DONE
+
+the 'return' keyword, and all that it implies ** done
+
+handle '@' symbol. ** done
+
+Address needs to handle arrayaccess. It also needs to handle an arrayaccess on a variable expression,
+which probably doesn't matter ** done
+
+limitmax and min ops. Probably not just expressions. Look into that. They are just expressions. **done
+
+allow use of lists and ranges in case statements **done
+
+UI for obstacles and robot position are improved **done
+
+something wrong with the encoders, ie the pivot and the distance are completely different **done
+
+something wrong with the readings on the sensors. Getting back a lot of 255, which I think is a -1 coming from
+who knows where **It was programmatic through my own spin code
+
+Robot collision with walls **done
+
+rand statement not working - update - it is now, I don't remember doing it **done
+rand expression is not working **done
+
+need to maintain the old location for the grippers. The collision is very sensitive and it often slips through.
+**done though it doesn't get used that I have seen
+
+change block detect to a flag that is set in the grippercollisions section, which is far more reliable. 
+can likely do away with oldgrippers also. Maybe not though, it may be necessary to deal with closing grippers
+-changed blockDetect to use radius. Works great **done
+
+lookup and lookdown, bytemove and byte copy **done
+
+test the random number function **works done
+
+make cnt not a multiple of 5000 **done
+
+Lanthier calls rand(?) on the cnt variable. So make cnt a variable **done
+
+:= must be an expression also - still working on this. **Done
+
+con blocks give an error when separated - i think because it expects those arcane constants in both blocks. Pretty sure 
+that is the case. damn **done
+
+bitwise operations. This is fairly important. **Done
+
+preinc and postinc don't work (ie, they both evaluate as preincs) **Done
+
+postinc not working as an expression **done
+
+
+DONE-ISH #################################################
+
+waitcnt and cnt **done-ish. To an estimated accuracy
+
+constants defined using other constants
+	-could run through them (even in antlr) saving the ones where it is undefined. Then try
+	them again at the end to see if they are legit. I would have to define an entirely new math
+	expression function ** I think it will work though it is untested
+	
+make the editor more editor-like **done-ish
+	
+the drawn in camera only resets its color to green if you call ... trackcolor or whatever. **fixed - call
+getcamerareading every iteration. poor man's fix
+
+fix the grippers/block deliver system. **done-ish - can still be made to break, but
+its reliable enough for now.
+
+Wall UI dialogs **kind of done
+
+if you put a comment at the end of an if statement for instance, the tabpreprocessor doesn't parse properly 
+maybe strip out the comments before preprocessing **done for single line comments
+
+comments after method headers **done
+
+% binary
+%% quat
+$ hex
+**done
+
+put in a save dialog **doneish using a message label
+
+apparently windows uses ascii 13 to end a line, rather than 10. hooray. Perhaps I can make it not a static **done
+
+if you put a {{ comment }} on a method header line and split it up, there
+will be problems. ** dubiously fixed
+
+(ASSIGNMENT := doo (:= (:= foo zoo) 2)) 
+(ASSIGNMENT := doo (:= foo(:= zoo 2)) 
+
+(ASSIGNMENT := doo (:= foo 2)) 
+ (ASSIGNMENT := doo (:= (:= foo zoo) 2)) 
+ (ASSIGNMENT := doo (:= (:= (:= foo zoo) doo) 2))
+IN PROGRESS ##############################################
+
+move tracker files to the default package. At the very least, Planner and Pose ** doesn't work, have
+to declare a package in the user Planner class. Apparently this can be done using reflection. ** not practical
+But will leave it here to research later.
+
+
+try and find some good java audio, or perhaps link to a c or c++ library, or something
+
+floattostring should be made a persistent string
+
+possibly a menu to define servo default values?
+
+improve the error reporting
+
+if you look at the documentation, there are a lot of expressions that can be unary statements as well.
+doh.
+Listd:
+bitwise not **done
+
+- , ^^ , |< , >| , not
+
+the others with an equals sign:
+
+#>= <#= ~>= <~= ->= <-= <<= >>= ><= &= |= ^= and= or= <>= >= <= === =>= =<=
+
+additional operators
+
+~> <~ -> <-(rotate) >> << ><(reverse)  
+
+also ? rand can be a post rand. What fun!! which means it is reversed, which means
+nothing, but it still must be included
+
+can access individual bytes of data from a variable using variable.byte[0] syntax. cheerisst
+
+java file dialog is crappy
+
+Conv numbers object
+
+AnonVariable has size? probably not
+
+abort
+
+DAT block
+
+***************importante**************8
+absolute value as a uary statement should assign its value to the variable, but as an
+assignment statement, probably should not.
+
+Square root of square root f's up. So do "3" bitwise not's in a row. Not 2. 3.
+because it only set eqls on the final expression
+
+Any statement that has a block will not end in a newline, but a dedent.
