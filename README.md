@@ -13,7 +13,7 @@ I have found it works quite well. If memory serves, I wrote 12k lines of origina
 It pretty much works. I have no doubt there are bugs, but I have a small collection of SPIN programs for which it compiles and
 runs and behaves how it is supposed to. 
 
-Edit: Up until now I left the project as an Eclipse project, so you either had to fire it up in Eclipse, or navigate the bin folder to the correct class. I have included robot-emulator.zip, which is a folder with an executable jar file, as well as the necessary config and graphics files in order to make it runnable with simply a double-click. Sorry for not including this sooner. 
+Edit:* Up until now I left the project as an Eclipse project, so you either had to fire it up in Eclipse, or navigate the bin folder to the correct class. I have included robot-emulator.zip, which is a folder with an executable jar file, as well as the necessary config and graphics files in order to make it runnable with simply a double-click. Sorry for not including this sooner. 
 
 The main class is dang.interpreter.IDE.java. This will bring up a primitive editor. The easiest thing to do is load up a
 program (file->load). I found that BlockGame.spin works the best. Some of the other programs I was using for testing, and I 
